@@ -23,22 +23,6 @@ Flight-Network-Analyzer/
 
 ## Backend
 
-### Requirements
-
-- CMake ≥ 3.20
-- A C++17-compatible compiler (GCC, Clang, or MSVC)
-
-### Build & Run
-
-```bash
-cd backend
-cmake -B build
-cmake --build build
-./build/flight_backend        # Linux / macOS
-build\flight_backend.exe      # Windows
-```
-
-> **Note:** With multi-config generators (Visual Studio, Xcode) the binary may be placed in a subdirectory such as `build/Debug/flight_backend` or `build/Release/flight_backend`.
 
 The server listens on **http://localhost:8090** by default.
 
@@ -46,7 +30,7 @@ The server listens on **http://localhost:8090** by default.
 
 ## Frontend
 
-The frontend is plain HTML and JavaScript — **no Node.js or `npm run dev` is needed**.
+The frontend is plain HTML and JavaScript.
 
 ### How to run
 
@@ -55,12 +39,7 @@ The frontend is plain HTML and JavaScript — **no Node.js or `npm run dev` is n
    - Double-click the file in your file manager, **or**
    - Drag `frontend/index.html` into an open browser window, **or**
    - Use a simple local file server if your browser blocks requests from a `file://` URL (some browsers apply CORS restrictions that prevent the page from calling the backend API when opened as a local file):
-     ```bash
-     # Python 3 (from the frontend directory)
-     cd frontend
-     python3 -m http.server 5500
-     # then open http://localhost:5500 in your browser
-     ```
+
 
 ### Features
 
