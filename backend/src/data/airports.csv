@@ -1,37 +1,41 @@
 id,code,name,city,country,latitude,longitude
-1,YVR,Vancouver Intl,Vancouver,Canada,49.1947,-123.1792
-2,LAX,Los Angeles Intl,Los Angeles,USA,33.9416,-118.4085
-3,DEN,Denver Intl,Denver,USA,39.8561,-104.6737
-4,ORD,O'Hare Intl,Chicago,USA,41.9742,-87.9073
-5,JFK,John F Kennedy Intl,New York,USA,40.6413,-73.7781
-6,MIA,Miami Intl,Miami,USA,25.7959,-80.287
-7,BOG,El Dorado Intl,Bogotá,Colombia,4.7016,-74.1469
-8,LIM,Jorge Chávez Intl,Lima,Peru,-12.0219,-77.1143
-9,SCL,Arturo Merino Benítez,Santiago,Chile,-33.3929,-70.7858
-10,EZE,Ministro Pistarini Intl,Buenos Aires,Argentina,-34.8222,-58.5358
-11,GRU,São Paulo/Guarulhos Intl,São Paulo,Brazil,-23.4356,-46.4731
-12,GIG,Rio de Janeiro/Galeão,Rio de Janeiro,Brazil,-22.809,-43.2506
-13,DUB,Dublin,Dublin,Ireland,53.4213,-6.2701
-14,LHR,Heathrow,London,UK,51.47,-0.4543
-15,CDG,Charles de Gaulle,Paris,France,49.0097,2.5479
-16,FRA,Frankfurt,Frankfurt,Germany,50.0379,8.5622
-17,ARN,Arlanda,Stockholm,Sweden,59.6519,17.9186
-18,ATH,Athens Intl,Athens,Greece,37.9364,23.9445
-19,CMN,Mohammed V Intl,Casablanca,Morocco,33.3675,-7.58997
-20,CAI,Cairo Intl,Cairo,Egypt,30.1219,31.4056
-21,ADD,Bole Intl,Addis Ababa,Ethiopia,8.9779,38.7993
-22,LOS,Murtala Muhammed Intl,Lagos,Nigeria,6.5774,3.3211
-23,NBO,Jomo Kenyatta Intl,Nairobi,Kenya,-1.3192,36.9278
-24,JNB,O. R. Tambo Intl,Johannesburg,South Africa,-26.1392,28.246
-25,DXB,Dubai Intl,Dubai,UAE,25.2532,55.3657
-26,DEL,Indira Gandhi Intl,Delhi,India,28.5562,77.1
-27,BKK,Suvarnabhumi,Bangkok,Thailand,13.69,100.7501
-28,HKG,Hong Kong Intl,Hong Kong,China,22.308,113.9185
-29,NRT,Narita Intl,Tokyo,Japan,35.772,140.3929
-30,ICN,Incheon Intl,Seoul,South Korea,37.4602,126.4407
-31,PER,Perth,Perth,Australia,-31.9403,115.9672
-32,DRW,Darwin Intl,Darwin,Australia,-12.4084,130.8727
-33,BNE,Brisbane,Brisbane,Australia,-27.3842,153.1175
-34,SYD,Sydney Kingsford Smith,Sydney,Australia,-33.9399,151.1753
-35,MEL,Melbourne,Melbourne,Australia,-37.6733,144.8433
-36,AKL,Auckland,Auckland,New Zealand,-37.0082,174.785
+1,YVR,Vancouver International Airport,Vancouver,Canada,49.193901062,-123.183998108
+2,LAX,Los Angeles International Airport,Los Angeles,United States,33.94250107,-118.4079971
+3,DEN,Denver International Airport,Denver,United States,39.861698150635,-104.672996521
+4,ORD,Chicago O'Hare International Airport,Chicago,United States,41.9786,-87.9048
+5,JFK,John F Kennedy International Airport,New York,United States,40.63980103,-73.77890015
+6,MIA,Miami International Airport,Miami,United States,25.793199539185,-80.290603637695
+7,YEG,Edmonton International Airport,Edmonton,Canada,53.3097000122,-113.580001831
+8,BOG,El Dorado International Airport,Bogota,Colombia,4.70159,-74.1469
+9,LIM,Jorge Chavez International Airport,Lima,Peru,-12.0219,-77.114305
+10,SCL,Comodoro Arturo Merino Benitez International Airport,Santiago,Chile,-33.393001556396,-70.785797119141
+11,EZE,Ministro Pistarini International Airport,Buenos Aires,Argentina,-34.8222,-58.5358
+12,GRU,Guarulhos - Governador Andre Franco Montoro International Airport,Sao Paulo,Brazil,-23.435556411743,-46.473056793213
+13,GIG,Rio Galeao - Tom Jobim International Airport,Rio De Janeiro,Brazil,-22.8099994659,-43.2505569458
+14,KEF,Keflavik International Airport,Keflavik,Iceland,63.985000610352,-22.605600357056
+15,DUB,Dublin Airport,Dublin,Ireland,53.421299,-6.27007
+16,LHR,London Heathrow Airport,London,United Kingdom,51.4706,-0.461941
+17,FRA,Frankfurt am Main Airport,Frankfurt,Germany,50.033333,8.570556
+18,ARN,Stockholm-Arlanda Airport,Stockholm,Sweden,59.651901245117,17.918600082397
+19,ATH,Eleftherios Venizelos International Airport,Athens,Greece,37.9364013672,23.9444999695
+20,CMN,Mohammed V International Airport,Casablanca,Morocco,33.367500305176,-7.589970111847
+21,CAI,Cairo International Airport,Cairo,Egypt,30.121900558472,31.405599594116
+22,ADD,Addis Ababa Bole International Airport,Addis Ababa,Ethiopia,8.97789001465,38.7993011475
+23,NBO,Jomo Kenyatta International Airport,Nairobi,Kenya,-1.31923997402,36.9277992249
+24,JNB,OR Tambo International Airport,Johannesburg,South Africa,-26.1392,28.246
+25,DXB,Dubai International Airport,Dubai,United Arab Emirates,25.2527999878,55.3643989563
+26,DEL,Indira Gandhi International Airport,Delhi,India,28.5665,77.103104
+27,BKK,Suvarnabhumi Airport,Bangkok,Thailand,13.681099891663,100.747001647949
+28,HKG,Hong Kong International Airport,Hong Kong,Hong Kong,22.308901,113.915001
+29,NRT,Narita International Airport,Tokyo,Japan,35.7647018433,140.386001587
+30,ICN,Incheon International Airport,Seoul,South Korea,37.469100952148,126.450996398926
+31,SVX,Koltsovo Airport,Yekaterinburg,Russia,56.743099212646,60.802700042725
+32,LED,Pulkovo Airport,St. Petersburg,Russia,59.800300598145,30.262500762939
+33,EVN,Zvartnots International Airport,Yerevan,Armenia,40.1473007202,44.3959007263
+34,YKS,Yakutsk Airport,Yakutsk,Russia,62.093299865723,129.77099609375
+35,PER,Perth International Airport,Perth,Australia,-31.940299987793,115.967002868652
+36,DRW,Darwin International Airport,Darwin,Australia,-12.414699554443,130.876998901367
+37,BNE,Brisbane International Airport,Brisbane,Australia,-27.384199142456,153.117004394531
+38,SYD,Sydney Kingsford Smith International Airport,Sydney,Australia,-33.946098327637,151.177001953125
+39,MEL,Melbourne International Airport,Melbourne,Australia,-37.673302,144.843002
+40,AKL,Auckland International Airport,Auckland,New Zealand,-37.0080986023,174.792007446

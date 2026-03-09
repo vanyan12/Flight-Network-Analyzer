@@ -66,12 +66,13 @@ let routesLayer = L.featureGroup().addTo(map);
 let selectedPathLayer = L.featureGroup().addTo(map);
 let airportMarkers = {};
 let activeRouteMetric = null;
+let activeRouteView = "directed";
 
 let highlightLine = null;
 
 function getRouteArrowSize() {
   const zoom = map.getZoom();
-  return Math.max(6, Math.min(14, Math.round(zoom * 1.4)));
+  return Math.max(8, Math.min(18, Math.round(zoom * 1.7)));
 }
 
 function formatRouteMetric(route) {
@@ -113,7 +114,7 @@ function addDirectedLine(layerGroup, latlngs, lineOptions, arrowOptions = {}) {
   L.polylineDecorator(line, {
     patterns: [
       {
-        offset: "50%",
+        offset: "52%",
         repeat: 0,
         symbol: L.Symbol.arrowHead({
           pixelSize: arrowOptions.pixelSize || 10,
@@ -130,6 +131,50 @@ function addDirectedLine(layerGroup, latlngs, lineOptions, arrowOptions = {}) {
   }).addTo(layerGroup);
 
   return line;
+}
+
+function addBidirectionalLine(layerGroup, latlngs, lineOptions, arrowOptions = {}) {
+  const line = L.polyline(latlngs, lineOptions).addTo(layerGroup);
+
+  L.polylineDecorator(line, {
+    patterns: [
+      {
+        offset: "46%",
+        repeat: 0,
+        symbol: L.Symbol.arrowHead({
+          pixelSize: arrowOptions.pixelSize || 10,
+          polygon: true,
+          pathOptions: {
+            pane: arrowOptions.pane || lineOptions.pane,
+            color: arrowOptions.color || lineOptions.color,
+            fillOpacity: arrowOptions.fillOpacity ?? 1,
+            weight: arrowOptions.weight || 2,
+          },
+        }),
+      },
+      {
+        offset: "54%",
+        repeat: 0,
+        symbol: L.Symbol.arrowHead({
+          pixelSize: arrowOptions.pixelSize || 10,
+          polygon: true,
+          pathOptions: {
+            pane: arrowOptions.pane || lineOptions.pane,
+            color: arrowOptions.color || lineOptions.color,
+            fillOpacity: arrowOptions.fillOpacity ?? 1,
+            weight: arrowOptions.weight || 2,
+          },
+          headAngle: 300,
+        }),
+      },
+    ],
+  }).addTo(layerGroup);
+
+  return line;
+}
+
+function addUndirectedLine(layerGroup, latlngs, lineOptions) {
+  return L.polyline(latlngs, lineOptions).addTo(layerGroup);
 }
 
 function clearMap() {
@@ -151,7 +196,17 @@ function clearSelectedPathResult() {
   setDijkstraDisplay();
 }
 
-function renderRoutes(routes) {
+function getUndirectedRouteKey(route) {
+  const a = `${route.src_lat},${route.src_lon}`;
+  const b = `${route.dst_lat},${route.dst_lon}`;
+  return [a, b].sort().join("|");
+}
+
+function getDirectedRouteKey(route) {
+  return `${route.src_lat},${route.src_lon}|${route.dst_lat},${route.dst_lon}`;
+}
+
+function renderDirectedRoutes(routes) {
   routesLayer.clearLayers();
 
   if (highlightLine) {
@@ -160,22 +215,91 @@ function renderRoutes(routes) {
   }
 
   const arrowSize = getRouteArrowSize();
+  const routeMap = new Map();
 
   for (const route of routes) {
+    routeMap.set(getDirectedRouteKey(route), route);
+  }
+
+  const rendered = new Set();
+
+  for (const route of routes) {
+    const key = getDirectedRouteKey(route);
+    if (rendered.has(key)) {
+      continue;
+    }
+
+    rendered.add(key);
     const latlngs = [
       [route.src_lat, route.src_lon],
       [route.dst_lat, route.dst_lon]
     ];
 
-    highlightLine = addDirectedLine(
+    const reverseKey = `${route.dst_lat},${route.dst_lon}|${route.src_lat},${route.src_lon}`;
+    const reverseRoute = routeMap.get(reverseKey);
+
+    if (reverseRoute) {
+      rendered.add(reverseKey);
+      highlightLine = addBidirectionalLine(
+        routesLayer,
+        latlngs,
+        { color: 'green', weight: 2, opacity: 0.6, pane: "routesPane" },
+        { color: 'green', pixelSize: arrowSize, pane: "routesPane" }
+      );
+    } else {
+      highlightLine = addDirectedLine(
+        routesLayer,
+        latlngs,
+        { color: 'green', weight: 2, opacity: 0.6, pane: "routesPane" },
+        { color: 'green', pixelSize: arrowSize, pane: "routesPane" }
+      );
+    }
+
+    bindRouteHover(highlightLine, route);
+  }
+}
+
+function renderUndirectedRoutes(routes) {
+  routesLayer.clearLayers();
+
+  if (highlightLine) {
+    map.removeLayer(highlightLine);
+    highlightLine = null;
+  }
+
+  const seen = new Set();
+
+  for (const route of routes) {
+    const key = getUndirectedRouteKey(route);
+    if (seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+
+    const latlngs = [
+      [route.src_lat, route.src_lon],
+      [route.dst_lat, route.dst_lon]
+    ];
+
+    highlightLine = addUndirectedLine(
       routesLayer,
       latlngs,
-      { color: 'green', weight: 2, opacity: 0.6, pane: "routesPane" },
-      { color: 'green', pixelSize: arrowSize, pane: "routesPane" }
+      { color: 'green', weight: 2, opacity: 0.6, pane: "routesPane" }
     );
 
     bindRouteHover(highlightLine, route);
   }
+}
+
+function renderRoutes(routes, view = activeRouteView) {
+  activeRouteView = view;
+
+  if (view === "undirected") {
+    renderUndirectedRoutes(routes);
+    return;
+  }
+
+  renderDirectedRoutes(routes);
 }
 
 function runDijkstra(weight, totalLabel) {
@@ -184,6 +308,10 @@ function runDijkstra(weight, totalLabel) {
   activeRouteMetric = weight;
   setResultTotalLabel(totalLabel);
   out(`Next step: call ${BACKEND}/dijkstra?src=${src}&dst=${dst}&weight=${weight}`);
+
+  if (Array.isArray(window._routes)) {
+    renderRoutes(window._routes, "directed");
+  }
 
   clearSelectedPathResult();
 
@@ -339,7 +467,7 @@ async function loadRoutes() {
   const routes = await r.json();
 
   window._routes = routes;
-  renderRoutes(routes);
+  renderRoutes(routes, "directed");
 
   out({ loaded_routes: routes.length });
 }
@@ -366,6 +494,10 @@ document.getElementById("k").addEventListener("change", () => {
 document.getElementById("btnReach").onclick = () => {
   if (!updateKValidation({ showAlert: true })) {
     return;
+  }
+
+  if (Array.isArray(window._routes)) {
+    renderRoutes(window._routes, "directed");
   }
 
   const src = document.getElementById("src").value;
@@ -396,6 +528,10 @@ document.getElementById("btnReach").onclick = () => {
 document.getElementById("btnArt").onclick = () => {
   if (!updateKValidation({ showAlert: true })) {
     return;
+  }
+
+  if (Array.isArray(window._routes)) {
+    renderRoutes(window._routes, "undirected");
   }
 
   out(`Next step: call ${BACKEND}/articulation`);

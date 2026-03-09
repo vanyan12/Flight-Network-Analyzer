@@ -333,7 +333,6 @@ int main() {
 
     httplib::Server app;
     Graph graph("src/data/routes.csv");
-    Graph test_graph("src/data/test.csv");
 
 
 
@@ -348,21 +347,6 @@ int main() {
         res.status = 204;
     });
 
-    // app.Get("/test-ap", [&](const httplib::Request&, httplib::Response& res) {
-    //     add_cors(res);
-    //     auto aps = test_graph.ArticulationPoints();
-
-    //     std::ostringstream oss;
-    //     oss << "{"
-    //         << "\"articulation_points\": [";
-    //     for (size_t i = 0; i < aps.size(); ++i) {
-    //         oss << "\"" << aps[i] << "\"";
-    //         if (i + 1 < aps.size()) oss << ",";
-    //     }
-    //     oss << "]";
-    //     oss << "}";
-    //     res.set_content(oss.str(), "application/json");
-    // });
 
 
     app.Get("/airports", [&](const httplib::Request&, httplib::Response& res) {
