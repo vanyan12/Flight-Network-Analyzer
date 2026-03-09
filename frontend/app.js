@@ -1,7 +1,10 @@
 const BACKEND = "http://localhost:8090";
 
-const out = (msg) => {
-  document.getElementById("out").textContent =
+const out = (msg, tone = "default") => {
+  const outEl = document.getElementById("out");
+  outEl.classList.toggle("is-error", tone === "error");
+  outEl.classList.toggle("is-success", tone === "success");
+  outEl.textContent =
     typeof msg === "string" ? msg : JSON.stringify(msg, null, 2);
 };
 
@@ -307,7 +310,6 @@ function runDijkstra(weight, totalLabel) {
   const dst = document.getElementById("dst").value;
   activeRouteMetric = weight;
   setResultTotalLabel(totalLabel);
-  out(`Next step: call ${BACKEND}/dijkstra?src=${src}&dst=${dst}&weight=${weight}`);
 
   if (Array.isArray(window._routes)) {
     renderRoutes(window._routes, "directed");
@@ -325,14 +327,17 @@ function runDijkstra(weight, totalLabel) {
       return r.json();
     })
     .then(result => {
-      out(result);
       if (!result.found || !Array.isArray(result.path) || result.path.length === 0) {
         setDijkstraDisplay({
-          total: "No path found.",
+          total: "",
           path: `${src} -> ${dst}`
         });
+
+        out("No path found.", "error");
         return;
       }
+
+      out(`Path is found!`, "success");
 
       setDijkstraDisplay({
         total: String(result.total) + (weight === "cost" ? " $" : " hrs"),
@@ -401,7 +406,6 @@ function populateSelect(selectEl, airports) {
 
 // --- Load airports ---
 async function loadAirports() {
-  out("Loading airports...");
   const r = await fetch(`${BACKEND}/airports`);
   if (!r.ok) throw new Error(`airports failed: ${r.status}`);
   const airports = await r.json();
@@ -426,7 +430,6 @@ async function loadAirports() {
     map.fitBounds(bounds.pad(-0.1));
   } 
 
-  out({ loaded_airports: airports.length });
 
   // Enable buttons once data exists (even if endpoints not done yet)
   document.getElementById("btnCheapest").disabled = false;
@@ -455,13 +458,27 @@ function markReachableAirports(src, airports) {
   }
 };
 
+function fitMapToAirportCodes(codes) {
+  const bounds = L.latLngBounds([]);
+
+  for (const code of codes) {
+    const marker = airportMarkers[code];
+    if (marker) {
+      bounds.extend(marker.getLatLng());
+    }
+  }
+
+  if (bounds.isValid()) {
+    map.fitBounds(bounds, { padding: [32, 32] });
+  }
+}
+
 document.getElementById("btnLoad").onclick = () => {
   loadAirports().catch(e => out("Error: " + e.message));
   loadRoutes().catch(e => out("Error: " + e.message));
 };
 
 async function loadRoutes() {
-  out("Loading routes...");
   const r = await fetch(`${BACKEND}/routes`);
   if (!r.ok) throw new Error(`routes failed: ${r.status}`);
   const routes = await r.json();
@@ -469,7 +486,6 @@ async function loadRoutes() {
   window._routes = routes;
   renderRoutes(routes, "directed");
 
-  out({ loaded_routes: routes.length });
 }
 
 document.getElementById("btnCheapest").onclick = () => {
@@ -502,7 +518,6 @@ document.getElementById("btnReach").onclick = () => {
 
   const src = document.getElementById("src").value;
   const k = document.getElementById("k").value;
-  out(`Next step: call ${BACKEND}/reachable?src=${src}&k=${k}`);
 
   fetch(`${BACKEND}/reachable?src=${src}&k=${k}`)
     .then(r => {
@@ -510,14 +525,13 @@ document.getElementById("btnReach").onclick = () => {
       return r.json();
     })
     .then(result => {
-      out(result);
       console.log(result);
       if (!result.reachable_airports || !Array.isArray(result.reachable_airports)) {
         out("No reachable airports found.");
         return;
       }
       const list = result.reachable_airports.map(r => r).join(", ");
-      out(`Airports reachable from ${src} within ${k} flights: ${list}`);
+      out(`Airports reachable from ${src} within ${k} flights: ${list}`, "success");
 
       clearMap();
       markReachableAirports(src, result.reachable_airports);
@@ -534,7 +548,6 @@ document.getElementById("btnArt").onclick = () => {
     renderRoutes(window._routes, "undirected");
   }
 
-  out(`Next step: call ${BACKEND}/articulation`);
 
   fetch(`${BACKEND}/articulation-points`)
     .then(r => {
@@ -542,8 +555,6 @@ document.getElementById("btnArt").onclick = () => {
       return r.json();
     })
     .then(result => {
-      out(result);
-      console.log(result);  
 
       if (!result.articulation_points || !Array.isArray(result.articulation_points)) {
         out("No articulation points found.");
@@ -551,15 +562,17 @@ document.getElementById("btnArt").onclick = () => {
       }
 
       const list = result.articulation_points.map(r => r).join(", ");
-      out(`Articulation points in the flight network: ${list}`);
+      out(`Articulation points: ${list}`, "success");
 
       clearMap();
       for (const code of result.articulation_points) {
         const marker = airportMarkers[code];
         if (marker) {
-          marker.setRadius(7).setStyle({ fillColor: 'purple' });
+          marker.setRadius(9).setStyle({ fillColor: 'purple' });
         }
       }
+
+      fitMapToAirportCodes(result.articulation_points);
     })
     .catch(e => out("Error: " + e.message));
 
