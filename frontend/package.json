@@ -1,0 +1,10 @@
+{
+  "name": "flight-network-frontend",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite"
+  },
+  "devDependencies": {
+    "vite": "^6.2.1"
+  }
+}
