@@ -41,11 +41,6 @@ Then open the URL shown in the terminal (e.g. `http://localhost:5173`) in your b
 2. Select a **Source** and **Destination** airport.
 3. Use the buttons to find the **cheapest** or **fastest** route (Dijkstra), list airports **reachable within K connections** (BFS), or identify **articulation points** in the network.
 
-## Building the backend from source
-
-Requirements: CMake ≥ 3.20 and a C++17-capable compiler (MSVC on Windows).
-
-```bash
 cd backend
 cmake -B build
 cmake --build build --config Release
