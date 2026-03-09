@@ -1,0 +1,37 @@
+id,code,name,city,country,latitude,longitude
+1,YVR,Vancouver Intl,Vancouver,Canada,49.1947,-123.1792
+2,LAX,Los Angeles Intl,Los Angeles,USA,33.9416,-118.4085
+3,DEN,Denver Intl,Denver,USA,39.8561,-104.6737
+4,ORD,O'Hare Intl,Chicago,USA,41.9742,-87.9073
+5,JFK,John F Kennedy Intl,New York,USA,40.6413,-73.7781
+6,MIA,Miami Intl,Miami,USA,25.7959,-80.287
+7,BOG,El Dorado Intl,Bogotá,Colombia,4.7016,-74.1469
+8,LIM,Jorge Chávez Intl,Lima,Peru,-12.0219,-77.1143
+9,SCL,Arturo Merino Benítez,Santiago,Chile,-33.3929,-70.7858
+10,EZE,Ministro Pistarini Intl,Buenos Aires,Argentina,-34.8222,-58.5358
+11,GRU,São Paulo/Guarulhos Intl,São Paulo,Brazil,-23.4356,-46.4731
+12,GIG,Rio de Janeiro/Galeão,Rio de Janeiro,Brazil,-22.809,-43.2506
+13,DUB,Dublin,Dublin,Ireland,53.4213,-6.2701
+14,LHR,Heathrow,London,UK,51.47,-0.4543
+15,CDG,Charles de Gaulle,Paris,France,49.0097,2.5479
+16,FRA,Frankfurt,Frankfurt,Germany,50.0379,8.5622
+17,ARN,Arlanda,Stockholm,Sweden,59.6519,17.9186
+18,ATH,Athens Intl,Athens,Greece,37.9364,23.9445
+19,CMN,Mohammed V Intl,Casablanca,Morocco,33.3675,-7.58997
+20,CAI,Cairo Intl,Cairo,Egypt,30.1219,31.4056
+21,ADD,Bole Intl,Addis Ababa,Ethiopia,8.9779,38.7993
+22,LOS,Murtala Muhammed Intl,Lagos,Nigeria,6.5774,3.3211
+23,NBO,Jomo Kenyatta Intl,Nairobi,Kenya,-1.3192,36.9278
+24,JNB,O. R. Tambo Intl,Johannesburg,South Africa,-26.1392,28.246
+25,DXB,Dubai Intl,Dubai,UAE,25.2532,55.3657
+26,DEL,Indira Gandhi Intl,Delhi,India,28.5562,77.1
+27,BKK,Suvarnabhumi,Bangkok,Thailand,13.69,100.7501
+28,HKG,Hong Kong Intl,Hong Kong,China,22.308,113.9185
+29,NRT,Narita Intl,Tokyo,Japan,35.772,140.3929
+30,ICN,Incheon Intl,Seoul,South Korea,37.4602,126.4407
+31,PER,Perth,Perth,Australia,-31.9403,115.9672
+32,DRW,Darwin Intl,Darwin,Australia,-12.4084,130.8727
+33,BNE,Brisbane,Brisbane,Australia,-27.3842,153.1175
+34,SYD,Sydney Kingsford Smith,Sydney,Australia,-33.9399,151.1753
+35,MEL,Melbourne,Melbourne,Australia,-37.6733,144.8433
+36,AKL,Auckland,Auckland,New Zealand,-37.0082,174.785
