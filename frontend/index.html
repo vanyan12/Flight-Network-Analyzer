@@ -12,8 +12,11 @@
   <style>
     body { margin:0; font-family: system-ui, Arial; height:100vh; display:flex; }
     #panel { width:350px; padding:12px; border-right:1px solid #ddd; box-sizing:border-box; overflow:auto; }
+    #sidebar { scrollbar-width:none; -ms-overflow-style:none; }
+    #sidebar::-webkit-scrollbar { width:0; height:0; display:none; }
     #map { flex:1; }
-    #out { background:#f6f6f6; color:#222; border:1px solid transparent; padding:8px; border-radius:8px; height:30px; overflow:auto; text-wrap-mode: wrap; }
+    #out { background:#f6f6f6; color:#222; border:1px solid transparent; padding:8px; border-radius:8px; min-height:3.2em; max-height:8.5em; line-height:1.4; margin:0; box-sizing:border-box; overflow-y:auto; overflow-x:hidden; white-space:pre-wrap; overflow-wrap:anywhere; }
+    #sidebar.results-hidden #out { min-height:4.8em; max-height:12em; }
     #out.is-error { color:#a61b1b; background:#ffe3e3; border-color:#f2b8b8; }
       #out.is-success { color:#166534; background:#dcfce7; border-color:#86efac; }
     h3 { margin: 6px 0 12px; }
@@ -31,6 +34,8 @@
     #kValidation.is-visible { display:block; }
     .result-box { background:#f6f6f6; padding:10px; border-radius:8px; min-height:42px; overflow:auto; white-space:pre-wrap; word-break:break-word; }
     #resultTotal { min-height:28px; padding:8px 10px; }
+    .result-section { display:block; }
+    #sidebar.results-hidden .result-section { display:none; }
 
   </style>
 </head>
@@ -78,11 +83,15 @@
     <h4>Message</h4>
     <pre id="out"></pre>
 
-    <h4 id="resultTotalLabel">Total</h4>
-    <div id="resultTotal" class="result-box">No result yet.</div>
+    <div class="result-section">
+      <h4 id="resultTotalLabel">Total</h4>
+      <div id="resultTotal" class="result-box">No result yet.</div>
+    </div>
 
-    <h4>Path</h4>
-    <div id="resultPath" class="result-box">No result yet.</div>
+    <div class="result-section">
+      <h4>Path</h4>
+      <div id="resultPath" class="result-box">No result yet.</div>
+    </div>
   </div>
 
   <div id="map"></div>

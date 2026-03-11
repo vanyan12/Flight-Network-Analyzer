@@ -17,6 +17,19 @@ const setResultTotalLabel = (label) => {
   document.getElementById("resultTotalLabel").textContent = label;
 };
 
+function setDijkstraPanelsVisible(isVisible) {
+  document.getElementById("sidebar").classList.toggle("results-hidden", !isVisible);
+}
+
+function showAnalysisMessageLayout() {
+  setDijkstraPanelsVisible(false);
+  setDijkstraDisplay({ total: "", path: "" });
+}
+
+function showDijkstraLayout() {
+  setDijkstraPanelsVisible(true);
+}
+
 function hasLoadedAirports() {
   return Array.isArray(window._airports) && window._airports.length > 0;
 }
@@ -381,6 +394,7 @@ function runDijkstra(weight, totalLabel) {
   const dst = document.getElementById("dst").value;
   activeRouteMetric = weight;
   setResultTotalLabel(totalLabel);
+  showDijkstraLayout();
 
   if (Array.isArray(window._routes)) {
     renderRoutes(window._routes, "directed");
@@ -630,6 +644,8 @@ document.getElementById("btnReach").onclick = () => {
     return;
   }
 
+  showAnalysisMessageLayout();
+
   if (Array.isArray(window._routes)) {
     renderRoutes(window._routes, "directed");
   }
@@ -649,7 +665,7 @@ document.getElementById("btnReach").onclick = () => {
         return;
       }
       const list = result.reachable_airports.map(r => r).join(", ");
-      out(`Airports reachable from ${src} within ${k} flights: ${list}`, "success");
+      out(`Airports reachable from ${src} within ${k} flights: \n\n ${list}`, "success");
 
       clearMap();
       markReachableAirports(src, result.reachable_airports);
@@ -661,6 +677,8 @@ document.getElementById("btnArt").onclick = () => {
   if (!updateKValidation({ showAlert: true })) {
     return;
   }
+
+  showAnalysisMessageLayout();
 
   if (Array.isArray(window._routes)) {
     renderRoutes(window._routes, "undirected");
@@ -680,7 +698,7 @@ document.getElementById("btnArt").onclick = () => {
       }
 
       const list = result.articulation_points.map(r => r).join(", ");
-      out(`Articulation points: ${list}`, "success");
+      out(`Articulation points: \n\n ${list}`, "success");
 
       clearMap();
       for (const code of result.articulation_points) {

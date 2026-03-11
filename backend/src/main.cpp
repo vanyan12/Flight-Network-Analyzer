@@ -392,6 +392,10 @@ public:
 int main() {
 
     httplib::Server app;
+
+    const char* port_env = std::getenv("PORT");
+    int port = port_env ? std::stoi(port_env) : 8080;
+
     Graph graph("src/data/routes.csv");
 
 
@@ -606,5 +610,5 @@ int main() {
     });
 
     std::cout << "Server running on http://localhost:8090\n";
-    app.listen("0.0.0.0", 8090);
+    app.listen("0.0.0.0", port);
 }
