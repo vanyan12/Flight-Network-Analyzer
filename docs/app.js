@@ -43,6 +43,31 @@ function updateMstButtonState() {
   mstButton.disabled = !hasLoadedAirports() || !getSelectedMstWeight();
 }
 
+function updateBudgetValidation() {
+  const budgetInput = document.getElementById("budget");
+  const validation = document.getElementById("budgetValidation");
+  const budgetButton = document.getElementById("btnBudget");
+  const airportsLoaded = hasLoadedAirports();
+  const budgetValue = Number(budgetInput.value);
+  const isEmpty = budgetInput.value === "";
+  const hasNegativeValue = !isEmpty && Number.isFinite(budgetValue) && budgetValue < 0;
+
+  if (hasNegativeValue) {
+    const message = "Negative values are not allowed for travel budget.";
+    budgetInput.setCustomValidity(message);
+    validation.textContent = message;
+    validation.classList.add("is-visible");
+    budgetButton.disabled = true;
+    return false;
+  }
+
+  budgetInput.setCustomValidity("");
+  validation.textContent = "";
+  validation.classList.remove("is-visible");
+  budgetButton.disabled = !airportsLoaded || isEmpty;
+  return !isEmpty;
+}
+
 function updateKValidation({ showAlert = false } = {}) {
   const kInput = document.getElementById("k");
   const validation = document.getElementById("kValidation");
@@ -554,6 +579,7 @@ async function loadAirports() {
   document.getElementById("btnFastest").disabled = false;
   updateMstButtonState();
   updateKValidation();
+  updateBudgetValidation();
 
 }
 
@@ -635,6 +661,14 @@ document.getElementById("k").addEventListener("change", () => {
   updateKValidation({ showAlert: true });
 });
 
+document.getElementById("budget").addEventListener("input", () => {
+  updateBudgetValidation();
+});
+
+document.getElementById("budget").addEventListener("change", () => {
+  updateBudgetValidation();
+});
+
 document.getElementById("mstWeight").addEventListener("change", updateMstButtonState);
 
 // ===========================================================
@@ -714,6 +748,40 @@ document.getElementById("btnArt").onclick = () => {
 
 };
 
+document.getElementById("btnBudget").onclick = () => {
+  if (!updateBudgetValidation()) {
+    return;
+  }
+
+  showAnalysisMessageLayout();
+
+  if (Array.isArray(window._routes)) {
+    renderRoutes(window._routes, "directed");
+  }
+
+  const src = document.getElementById("src").value;
+  const budget = document.getElementById("budget").value;
+
+  fetch(`${BACKEND}/budget-limited?src=${encodeURIComponent(src)}&budget=${encodeURIComponent(budget)}`)
+    .then(r => {
+      if (!r.ok) throw new Error(`budget-limited failed: ${r.status}`);
+      return r.json();
+    })
+    .then(result => {
+      if (!result.reachable_airports || !Array.isArray(result.reachable_airports)) {
+        out("No reachable airports found.", "error");
+        return;
+      }
+
+      const list = result.reachable_airports.join(", ");
+      out(`Airports reachable from ${src} within budget ${budget}:\n\n${list || "None"}`, "success");
+
+      clearMap();
+      markReachableAirports(src, result.reachable_airports);
+    })
+    .catch(e => out("Error: " + e.message));
+};
+
 document.getElementById("mst").onclick = () => {
   const weight = getSelectedMstWeight();
 
@@ -736,5 +804,6 @@ document.getElementById("mst").onclick = () => {
 }
 
 updateKValidation();
+updateBudgetValidation();
 updateMstButtonState();
 

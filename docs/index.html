@@ -30,8 +30,8 @@
     .field-group { flex:1; min-width:0; }
     .field-group label { margin-top:0; }
     .muted { color:#666; font-size: 12px; }
-    #kValidation { display:none; color:#a61b1b; background:#ffe3e3; border:1px solid #f2b8b8; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; font-weight:600; box-sizing:border-box; }
-    #kValidation.is-visible { display:block; }
+    #kValidation, #budgetValidation { display:none; color:#a61b1b; background:#ffe3e3; border:1px solid #f2b8b8; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; font-weight:600; box-sizing:border-box; }
+    #kValidation.is-visible, #budgetValidation.is-visible { display:block; }
     .result-box { background:#f6f6f6; padding:10px; border-radius:8px; min-height:42px; overflow:auto; white-space:pre-wrap; word-break:break-word; }
     #resultTotal { min-height:28px; padding:8px 10px; }
     .result-section { display:block; }
@@ -67,6 +67,11 @@
     <input id="k" type="number" value="2" min="0" max="10"/>
     <div id="kValidation" class="muted" aria-live="polite"></div>
     <button id="btnReach" disabled>Reachable within K</button>
+
+    <label>Travel budget</label>
+    <input id="budget" type="number" value="100" min="0" step="10"/>
+    <div id="budgetValidation" class="muted" aria-live="polite"></div>
+    <button id="btnBudget" disabled>Reachable within budget</button>
 
     <button id="btnArt" disabled>Articulation points</button>
 

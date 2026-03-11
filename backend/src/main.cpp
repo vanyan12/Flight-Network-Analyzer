@@ -385,6 +385,76 @@ public:
 
         return mst_edges;
     }
+
+    std::vector<std::string> budgetLimited(const std::string& src, const double& budget) {
+        std::unordered_map<std::string, double> dist;
+        std::vector<std::string> reachable_airports;
+
+        std::priority_queue<
+            std::pair<double, std::string>,
+            std::vector<std::pair<double, std::string>>,
+            std::greater<> // a has lowewr weight than b if a > b
+        > pq;
+
+        std::unordered_set<std::string> nodes;
+        
+        // Collect all unique nodes from the adjacency list
+        for (const auto& pair : directed_adj) {
+            nodes.insert(pair.first);
+
+            for (const Flight& flight : pair.second) {
+                nodes.insert(flight.destination);
+            }
+        }
+
+        // Initialize distances to infinity
+        for (const auto& node : nodes) {
+            dist[node] = std::numeric_limits<double>::infinity();
+        }
+
+        dist[src] = 0;
+        pq.push({0, src});
+
+        while (!pq.empty()) {
+            auto [dist_v, v] = pq.top();
+            pq.pop();
+
+
+            if (dist_v > dist[v]) {
+                continue; // Skip if we already found a better path
+            }
+
+            auto it = directed_adj.find(v);
+
+            if (it == directed_adj.end()) {
+                continue; // No outgoing flights from this airport
+            }
+
+            if (dist[v] > budget) {
+                continue; // Skip if we already exceed the budget
+            }
+
+
+            for (const Flight& flight : it->second) {
+                double edge_weight = flight.cost;
+
+                double new_dist = dist[v] + edge_weight;
+
+                if (new_dist > budget) {
+                    continue; // Skip if this path exceeds the budget
+                }
+
+                if (new_dist < dist[flight.destination]) { //flight.destination is the neighbor
+                    dist[flight.destination] = new_dist; // Update distance to shortest path to neighbor
+                    reachable_airports.push_back(flight.destination); // Add to reachable airports if within budget
+                    pq.push({new_dist, flight.destination}); // Add neighbor to priority queue with updated distance
+                }
+            }
+        }
+
+
+        return reachable_airports;
+    }
 };
 
 
@@ -603,6 +673,34 @@ int main() {
                 << "\"weight\": " << edge.weight
                 << "}";
             if (i + 1 < mst_edges.size()) oss << ",";
+        }
+        oss << "]";
+        oss << "}";
+        res.set_content(oss.str(), "application/json");
+    });
+
+    app.Get("/budget-limited", [&](const httplib::Request& req, httplib::Response& res) {
+        add_cors(res);
+        auto src_it = req.params.find("src");
+        auto budget_it = req.params.find("budget");
+        
+        if (src_it == req.params.end() || budget_it == req.params.end()) {
+            res.status = 400;
+            res.set_content("{\"error\":\"Missing src or budget parameter\"}", "application/json");
+            return;
+        }
+
+        std::string src = src_it->second;
+        double budget = std::stod(budget_it->second);
+
+        auto reachable_airports = graph.budgetLimited(src, budget);
+
+        std::ostringstream oss;
+        oss << "{"
+            << "\"reachable_airports\": [";
+        for (size_t i = 0; i < reachable_airports.size(); ++i) {
+            oss << "\"" << reachable_airports[i] << "\"";
+            if (i + 1 < reachable_airports.size()) oss << ",";
         }
         oss << "]";
         oss << "}";
