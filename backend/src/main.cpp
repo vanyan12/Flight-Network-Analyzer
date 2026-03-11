@@ -28,6 +28,12 @@ struct Airport {
     double longitude;
 };
 
+struct CandidateEdge {
+    std::string from;
+    std::string to;
+    double weight;
+};
+
 struct PathResult {
     double total;
     std::vector<std::string> path;
@@ -325,6 +331,60 @@ public:
 
         return std::vector<std::string>(ap.begin(), ap.end());
     }
+
+    std::vector<CandidateEdge> Prim(const std::string& weight_type) {
+        struct CompareEdge {
+            bool operator()(const CandidateEdge& a, const CandidateEdge& b) const {
+                return a.weight > b.weight;
+            }
+        };
+
+        auto get_edge_weight = [&](const Flight& flight) -> double {
+            if (weight_type == "cost") return flight.cost;
+            if (weight_type == "duration") return flight.duration;
+            if (weight_type == "distance") return flight.distance;
+            throw std::invalid_argument("Invalid weight type: " + weight_type);
+        };
+
+        std::unordered_set<std::string> visited;
+        std::vector<CandidateEdge> mst_edges;
+
+        std::priority_queue<
+            CandidateEdge,
+            std::vector<CandidateEdge>,
+            CompareEdge
+        > pq;
+
+        for (const auto& [start, _] : undirected_adj) {
+            if (visited.count(start)) continue;
+
+            visited.insert(start);
+
+            for (const Flight& flight : undirected_adj[start]) {
+                pq.push({start, flight.destination, get_edge_weight(flight)});
+            }
+
+            while (!pq.empty()) {
+                CandidateEdge best = pq.top();
+                pq.pop();
+
+                if (visited.count(best.to)) {
+                    continue;
+                }
+
+                visited.insert(best.to);
+                mst_edges.push_back({best.from, best.to, best.weight});
+
+                for (const Flight& flight : undirected_adj[best.to]) {
+                    if (!visited.count(flight.destination)) {
+                        pq.push({best.to, flight.destination, get_edge_weight(flight)});
+                    }
+                }
+            }
+        }
+
+        return mst_edges;
+    }
 };
 
 
@@ -515,7 +575,35 @@ int main() {
         res.set_content(oss.str(), "application/json");
     });
 
+    app.Get("/mst", [&](const httplib::Request& req, httplib::Response& res) {
+        add_cors(res);
+        auto weight_it = req.params.find("weight");
+        if (weight_it == req.params.end()) {
+            res.status = 400;
+            res.set_content("{\"error\":\"Missing weight parameter\"}", "application/json");
+            return;
+        }
+        
+        std::string weight = weight_it->second;
 
+        auto mst_edges = graph.Prim(weight);
+
+        std::ostringstream oss;
+        oss << "{"
+            << "\"edges\": [";
+        for (size_t i = 0; i < mst_edges.size(); ++i) {
+            const auto& edge = mst_edges[i];
+            oss << "{"
+                << "\"from\": \"" << edge.from << "\","
+                << "\"to\": \"" << edge.to << "\","
+                << "\"weight\": " << edge.weight
+                << "}";
+            if (i + 1 < mst_edges.size()) oss << ",";
+        }
+        oss << "]";
+        oss << "}";
+        res.set_content(oss.str(), "application/json");
+    });
 
     std::cout << "Server running on http://localhost:8090\n";
     app.listen("0.0.0.0", 8090);

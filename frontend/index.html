@@ -11,17 +11,21 @@
 
   <style>
     body { margin:0; font-family: system-ui, Arial; height:100vh; display:flex; }
-    #panel { width:250px; padding:12px; border-right:1px solid #ddd; box-sizing:border-box; overflow:auto; }
+    #panel { width:350px; padding:12px; border-right:1px solid #ddd; box-sizing:border-box; overflow:auto; }
     #map { flex:1; }
-    #out { background:#f6f6f6; color:#222; border:1px solid transparent; padding:10px; border-radius:8px; height:40px; overflow:auto; text-wrap-mode: wrap; }
+    #out { background:#f6f6f6; color:#222; border:1px solid transparent; padding:8px; border-radius:8px; height:30px; overflow:auto; text-wrap-mode: wrap; }
     #out.is-error { color:#a61b1b; background:#ffe3e3; border-color:#f2b8b8; }
       #out.is-success { color:#166534; background:#dcfce7; border-color:#86efac; }
     h3 { margin: 6px 0 12px; }
     h4 { margin: 14px 0 8px; }
     label { display:block; margin-top:10px; font-size: 13px; color:#444; }
-    select, input, button { width:100%; padding:10px; margin-top:6px; box-sizing:border-box; }
+    select, input, button { width:100%; padding:8px; margin-top:5px; box-sizing:border-box; }
     .row { display:flex; gap:8px; }
+    .row button { flex:1; }
     .row > * { flex:1; }
+    .field-row { display:flex; gap:8px; margin-top:10px; }
+    .field-group { flex:1; min-width:0; }
+    .field-group label { margin-top:0; }
     .muted { color:#666; font-size: 12px; }
     #kValidation { display:none; color:#a61b1b; background:#ffe3e3; border:1px solid #f2b8b8; border-radius:6px; padding:8px 10px; margin-top:6px; font-size:12px; font-weight:600; box-sizing:border-box; }
     #kValidation.is-visible { display:block; }
@@ -37,15 +41,21 @@
 
     <button id="btnLoad">Load airports</button>
 
-    <label>Source</label>
-    <select id="src"></select>
-
-    <label>Destination</label>
-    <select id="dst"></select>
-
+    <div class="field-row">
+      <div class="field-group">
+        <label>Source</label>
+        <select id="src"></select>
+      </div>
+      <div class="field-group">
+        <label>Destination</label>
+        <select id="dst"></select>
+      </div>
+    </div>
+      
+    <label>Dijkstra</label>
     <div class="row">
-      <button id="btnCheapest" disabled>Cheapest (Dijkstra)</button>
-      <button id="btnFastest" disabled>Fastest (Dijkstra)</button>
+      <button id="btnCheapest" disabled>Cheapest</button>
+      <button id="btnFastest" disabled>Fastest</button>
     </div>
 
     <label>K connections (BFS)</label>
@@ -54,6 +64,16 @@
     <button id="btnReach" disabled>Reachable within K</button>
 
     <button id="btnArt" disabled>Articulation points</button>
+
+    <label>MST weight</label>
+    <select id="mstWeight">
+      <option value="">Select MST weight</option>
+      <option value="cost">Cost</option>
+      <option value="duration">Duration</option>
+      <option value="distance">Distance</option>
+    </select>
+
+    <button id="mst" disabled>Minimum Spanning Tree</button>
 
     <h4>Message</h4>
     <pre id="out"></pre>

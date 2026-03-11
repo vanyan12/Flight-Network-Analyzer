@@ -21,6 +21,15 @@ function hasLoadedAirports() {
   return Array.isArray(window._airports) && window._airports.length > 0;
 }
 
+function getSelectedMstWeight() {
+  return document.getElementById("mstWeight").value;
+}
+
+function updateMstButtonState() {
+  const mstButton = document.getElementById("mst");
+  mstButton.disabled = !hasLoadedAirports() || !getSelectedMstWeight();
+}
+
 function updateKValidation({ showAlert = false } = {}) {
   const kInput = document.getElementById("k");
   const validation = document.getElementById("kValidation");
@@ -305,6 +314,68 @@ function renderRoutes(routes, view = activeRouteView) {
   renderDirectedRoutes(routes);
 }
 
+function renderMstEdges(result) {
+  if (!result || !Array.isArray(result.edges)) {
+    out("No MST found.", "error");
+    return;
+  }
+
+  clearMap();
+  routesLayer.clearLayers();
+
+  if (highlightLine) {
+    map.removeLayer(highlightLine);
+    highlightLine = null;
+  }
+
+  const airportMap = {};
+  for (const airport of window._airports || []) {
+    airportMap[airport.code] = airport;
+  }
+
+  const bounds = L.latLngBounds([]);
+  let drawnEdges = 0;
+
+  for (const edge of result.edges) {
+    const fromAirport = airportMap[edge.from];
+    const toAirport = airportMap[edge.to];
+
+    if (!fromAirport || !toAirport) {
+      continue;
+    }
+
+    const latlngs = [
+      [fromAirport.lat, fromAirport.lon],
+      [toAirport.lat, toAirport.lon]
+    ];
+
+    const line = addUndirectedLine(
+      routesLayer,
+      latlngs,
+      { color: "#157425", weight: 3, opacity: 0.85, pane: "routesPane" }
+    );
+
+    line.bindTooltip(`Weight: ${edge.weight}`, {
+      sticky: true,
+      direction: "top",
+      opacity: 0.95,
+    });
+
+    bounds.extend(latlngs[0]);
+    bounds.extend(latlngs[1]);
+    drawnEdges++;
+  }
+
+  if (drawnEdges === 0) {
+    out("MST edges were returned, but their airports could not be matched on the map.", "error");
+    return;
+  }
+
+  if (bounds.isValid()) {
+    map.fitBounds(bounds, { padding: [20, 20] });
+  }
+}
+
 function runDijkstra(weight, totalLabel) {
   const src = document.getElementById("src").value;
   const dst = document.getElementById("dst").value;
@@ -391,17 +462,50 @@ function addAirportMarker(a) {
   return m;
 }
 
+function setAirportSelectDisplayMode(selectEl, mode) {
+  for (const option of selectEl.options) {
+    option.textContent = mode === "full"
+      ? option.dataset.fullLabel
+      : option.dataset.shortLabel;
+  }
+}
+
+function setupAirportSelectBehavior(selectEl) {
+  if (selectEl.dataset.behaviorInitialized === "true") {
+    return;
+  }
+
+  selectEl.addEventListener("focus", () => {
+    setAirportSelectDisplayMode(selectEl, "full");
+  });
+
+  selectEl.addEventListener("change", () => {
+    setAirportSelectDisplayMode(selectEl, "short");
+  });
+
+  selectEl.addEventListener("blur", () => {
+    setAirportSelectDisplayMode(selectEl, "short");
+  });
+
+  selectEl.dataset.behaviorInitialized = "true";
+}
+
 function populateSelect(selectEl, airports) {
   selectEl.innerHTML = "";
   for (const a of airports) {
     const opt = document.createElement("option");
     opt.value = a.code;
-    opt.textContent = `${a.code} — ${a.city}`;
+    opt.dataset.shortLabel = a.code;
+    opt.dataset.fullLabel = `${a.code} — ${a.city}`;
+    opt.textContent = opt.dataset.shortLabel;
 
     if (![...selectEl.options].some(o => o.value === a.code)) {
       selectEl.appendChild(opt);
     }
   }
+
+  setupAirportSelectBehavior(selectEl);
+  setAirportSelectDisplayMode(selectEl, "short");
 }
 
 // --- Load airports ---
@@ -434,6 +538,7 @@ async function loadAirports() {
   // Enable buttons once data exists (even if endpoints not done yet)
   document.getElementById("btnCheapest").disabled = false;
   document.getElementById("btnFastest").disabled = false;
+  updateMstButtonState();
   updateKValidation();
 
 }
@@ -473,6 +578,17 @@ function fitMapToAirportCodes(codes) {
   }
 }
 
+function showAllAirportsOnMap() {
+  const bounds = markersLayer.getBounds();
+
+  if (bounds.isValid()) {
+    map.fitBounds(bounds.pad(0.1), { padding: [32, 32] });
+    return;
+  }
+
+  map.setView([40, 20], 2);
+}
+
 document.getElementById("btnLoad").onclick = () => {
   loadAirports().catch(e => out("Error: " + e.message));
   loadRoutes().catch(e => out("Error: " + e.message));
@@ -504,6 +620,8 @@ document.getElementById("k").addEventListener("input", () => {
 document.getElementById("k").addEventListener("change", () => {
   updateKValidation({ showAlert: true });
 });
+
+document.getElementById("mstWeight").addEventListener("change", updateMstButtonState);
 
 // ===========================================================
 
@@ -572,11 +690,33 @@ document.getElementById("btnArt").onclick = () => {
         }
       }
 
-      fitMapToAirportCodes(result.articulation_points);
+      showAllAirportsOnMap();
     })
     .catch(e => out("Error: " + e.message));
 
 };
 
+document.getElementById("mst").onclick = () => {
+  const weight = getSelectedMstWeight();
+
+  if (!weight) {
+    out("Select one MST weight.", "error");
+    updateMstButtonState();
+    return;
+  }
+
+  fetch(`${BACKEND}/mst?weight=${encodeURIComponent(weight)}`)
+    .then(r => {
+      if (!r.ok) throw new Error(`mst failed: ${r.status}`);
+      return r.json();
+    })
+    .then(result => {
+      out(`Showing MST by ${weight}`, "success");
+      renderMstEdges(result);
+    })
+    .catch(e => out("Error: " + e.message));
+}
+
 updateKValidation();
+updateMstButtonState();
 
