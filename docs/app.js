@@ -703,6 +703,7 @@ document.getElementById("btnReach").onclick = () => {
 
       clearMap();
       markReachableAirports(src, result.reachable_airports);
+      showAllAirportsOnMap();
     })
     .catch(e => out("Error: " + e.message));
 };
