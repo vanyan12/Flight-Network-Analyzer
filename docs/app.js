@@ -1,4 +1,4 @@
-const BACKEND = "http://localhost:8090";
+const BACKEND = "https://flight-network-analyzer.onrender.com";
 
 const out = (msg, tone = "default") => {
   const outEl = document.getElementById("out");
