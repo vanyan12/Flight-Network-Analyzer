@@ -1,6 +1,0 @@
-source,destination,cost,duration,distance
-YVR,LAX,120,2.5,1741
-LAX,DEN,140,2.3,1385
-DEN,ORD,110,2.0,1426
-DEN,JFK,180,3.1,2610
-JFK,MIA,130,2.8,1757
