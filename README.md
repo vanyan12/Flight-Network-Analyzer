@@ -8,19 +8,11 @@ An interactive, graph-based flight network visualization and analysis tool. The 
 
 - [Overview](#overview)
 - [Live Demo](#live-demo)
-- [How to Use the Demo](#how-to-use-the-demo)
 - [Technologies Used](#technologies-used)
 - [Architecture](#architecture)
 - [Public API Reference](#public-api-reference)
-  - [GET /airports](#get-airports)
-  - [GET /routes](#get-routes)
-  - [GET /dijkstra](#get-dijkstra)
-  - [GET /reachable](#get-reachable)
-  - [GET /articulation-points](#get-articulation-points)
-  - [GET /mst](#get-mst)
-  - [GET /budget-limited](#get-budget-limited)
 - [Complexity Analysis Summary](#complexity-analysis-summary)
-- [Running Locally](#running-locally)
+- [Music Used](#music-used)
 
 ---
 
@@ -40,61 +32,23 @@ Results are rendered interactively on a Leaflet.js map with color-coded markers 
 
 ---
 
-## Live Demo
+## 🎞Live Demo
 
-🌐 **[https://vanyan12.github.io/Flight-Network-Analyzer/](https://vanyan12.github.io/Flight-Network-Analyzer/)**
+🔗 **[https://vanyan12.github.io/Flight-Network-Analyzer/](https://vanyan12.github.io/Flight-Network-Analyzer/)**
 
-The demo page is served directly from the `docs/` folder via GitHub Pages. The backend API runs at `https://flight-network-analyzer.onrender.com`.
+The demo page is served directly from the `docs/` folder via GitHub Pages.
 
 > **Note:** The backend is hosted on Render's free tier and may take ~30 seconds to wake up on the first request after a period of inactivity.
 
 ---
 
-## How to Use the Demo
-
-### 1. Load the Network
-
-Click **"Load airports"** to fetch all airports and routes from the backend. Airports appear as blue circle markers on the world map and all flight routes are drawn as directed arrows.
-
-### 2. Find the Cheapest or Fastest Path (Dijkstra)
-
-1. Select a **Source** and a **Destination** airport from the dropdowns.
-2. Click **Cheapest** to find the minimum-cost path, or **Fastest** for minimum-duration.
-3. The path is highlighted in **red** on the map. The total cost (or duration) and the ordered list of airports appear in the result panel below the map controls.
-
-### 3. Explore K-Hop Reachability (BFS)
-
-1. Select a **Source** airport.
-2. Enter a value for **K** (the maximum number of connections, between 0 and 10).
-3. Click **"Reachable within K"**.
-4. The source airport turns **gold** and all airports reachable within *K* flights are highlighted in **orange**.
-
-### 4. Travel Within a Budget
-
-1. Select a **Source** airport.
-2. Enter a **Travel budget** in dollars.
-3. Click **"Reachable within budget"**.
-4. All airports reachable without exceeding the budget are highlighted in **orange**.
-
-### 5. Find Critical Hubs (Articulation Points)
-
-Click **"Articulation points"**. The graph is analysed for *cut vertices* — airports whose removal would split the network into disconnected components. These critical hubs are highlighted in **purple** and listed in the message panel.
-
-### 6. Compute the Minimum Spanning Tree
-
-1. Choose a weight from the **MST weight** dropdown: **Cost**, **Duration**, or **Distance**.
-2. Click **"Minimum Spanning Tree"**.
-3. The MST edges are drawn in **dark green** on the map. Hover over any edge to see its weight.
-
----
-
-## Technologies Used
+## 💻Technologies Used
 
 | Layer | Technology | Purpose |
 |---|---|---|
 | **Backend** | C++ 17 | Core graph algorithms and HTTP server |
 | **HTTP Server** | [cpp-httplib](https://github.com/yhirose/cpp-httplib) | Header-only REST server |
-| **Build System** | CMake 3.20+ | C++ compilation |
+| **Build System** | g++ (C++17) |  |
 | **Containerization** | Docker (Ubuntu 24.04) | Reproducible deployment |
 | **Frontend** | HTML5 + Vanilla JavaScript | UI and API integration |
 | **Maps** | [Leaflet.js 1.9.4](https://leafletjs.com/) | Interactive map rendering |
@@ -105,37 +59,28 @@ Click **"Articulation points"**. The graph is analysed for *cut vertices* — ai
 
 ---
 
-## Architecture
+## 🏗Architecture
 
 ```
-┌─────────────────────┐          HTTP/JSON          ┌──────────────────────┐
-│   Browser (docs/)   │ ◄──────────────────────────► │  C++ Backend Server  │
-│                     │                              │                      │
-│  index.html         │  GET /airports               │  load_airports()     │
-│  app.js             │  GET /routes                 │  Graph::Dijkstra()   │
-│  Leaflet.js map     │  GET /dijkstra               │  Graph::Reachable()  │
+┌─────────────────────┐          HTTP/JSON           ┌──────────────────────────────┐
+│   Browser (docs/)   │ ◄──────────────────────────► │      C++ Backend Server      │
+│                     │                              │                              │
+│  index.html         │  GET /airports               │  load_airports()             │
+│  app.js             │  GET /routes                 │  Graph::Dijkstra()           │
+│  Leaflet.js map     │  GET /dijkstra               │  Graph::Reachable()          │
 │                     │  GET /reachable              │  Graph::ArticulationPoints() │
-│  Airport markers    │  GET /articulation-points    │  Graph::Prim()       │
-│  Route polylines    │  GET /mst                    │  Graph::budgetLimited() │
-│  Algorithm results  │  GET /budget-limited         │                      │
-└─────────────────────┘                              └──────────────────────┘
+│  Airport markers    │  GET /articulation-points    │  Graph::Prim()               │
+│  Route polylines    │  GET /mst                    │  Graph::budgetLimited()      │
+│  Algorithm results  │  GET /budget-limited         │                              │
+└─────────────────────┘                              └──────────────────────────────┘
 ```
 
 **Data:** 40 airports and 100 routes stored in CSV files (`airports.csv`, `routes.csv`). Each route carries three weights: **cost** (USD), **duration** (hours), and **distance** (km).
 
 ---
 
-## Public API Reference
+## 🌐Public API Reference
 
-The base URL for the hosted backend is:
-
-```
-https://flight-network-analyzer.onrender.com
-```
-
-All endpoints return JSON. All endpoints support CORS.
-
----
 
 ### `GET /airports`
 
@@ -361,7 +306,7 @@ GET /budget-limited?src=YVR&budget=500
 
 ---
 
-## Complexity Analysis Summary
+## 📊Complexity Analysis Summary
 
 | Endpoint | Algorithm | Time Complexity | Space Complexity |
 |---|---|---|---|
@@ -377,35 +322,9 @@ GET /budget-limited?src=YVR&budget=500
 
 ---
 
-## Running Locally
+## 🎧Music Used
+<img src="https://pickasso.spotifycdn.com/image/ab67c0de0000deef/dt/v1/img/artistmix/00FQb4jTyendYWaN8pK0wa/en" width="200" />
 
-### Backend (C++)
+[Lana Del Rey Late Night Drive Playlist](https://youtu.be/dCn84j3Ijg0?si=0JAkkNIpKLH06Pr1)
 
-```bash
-cd backend
-mkdir build && cd build
-cmake ..
-cmake --build .
-./flight_server          # Starts on port 8080 by default
-```
 
-Set the `PORT` environment variable to override the default port.
-
-### Backend with Docker
-
-```bash
-cd backend
-docker build -t flight-server .
-docker run -p 8080:8080 flight-server
-```
-
-### Frontend
-
-The frontend is pure HTML/JS — no build step needed. Open `docs/index.html` directly in a browser, or serve it with any static file server:
-
-```bash
-cd docs
-npx serve .
-```
-
-> By default, `app.js` points to the hosted Render backend. To use your local backend, change the `BACKEND` constant at the top of `docs/app.js` to `http://localhost:8080`.
