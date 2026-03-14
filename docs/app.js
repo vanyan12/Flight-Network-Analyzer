@@ -779,6 +779,7 @@ document.getElementById("btnBudget").onclick = () => {
 
       clearMap();
       markReachableAirports(src, result.reachable_airports);
+      fitMapToAirportCodes([src, ...result.reachable_airports]);
     })
     .catch(e => out("Error: " + e.message));
 };
