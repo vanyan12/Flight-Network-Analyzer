@@ -1,24 +1,23 @@
 #include "graph.h"
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <queue>
+#include <functional>
 #include <limits>
 #include <iostream>
+#include <unordered_set>
+#include <stdexcept>
 
+    Graph::Graph(const std::string& routes_csv) {
+        directed_adj = make_adj_list(routes_csv, true);
+        undirected_adj = make_adj_list(routes_csv, false);
+    }
 
-class Graph {
-
-private:
-    AdjList directed_adj;
-    AdjList undirected_adj;
-    std::unordered_map<std::string, int> disc;
-    std::unordered_map<std::string, int> low;
-    std::unordered_map<std::string, std::string> parent;
-    int time = 1;
 
     // O(E) time complexity where E is the number of routes in the file
     // O(V + E) space complexity where V is the number of unique airports and E is the number of routes
-    AdjList make_adj_list(const std::string& filename, bool directed = true) {
+    AdjList Graph::make_adj_list(const std::string& filename, bool directed = true) {
         
         // O(V) space for the keys in the adjacency list, where V is the number of unique airports
         // O(E) space for the edges in the adjacency list, where E is the number of routes
@@ -59,7 +58,7 @@ private:
 
     // O(V_k + E_k) time complexity for BFS where V_k is the number of unique airports reachable within K flights and E_k is the number of routes among those airports
     // O(V) space complexity for visited set, queue, and reachable airports list in the worst case where all airports are reachable within K flights
-    std::vector<std::string> bfs(const std::string& src, int K){
+    std::vector<std::string> Graph::bfs(const std::string& src, int K){
         std::unordered_set<std::string> visited;// O(V) space complexity for visited set, where V is the number of unique airports
         std::vector<std::string> reachable_airports; // O(V) space complexity for reachable airports list, where V is the number of unique airports reachable within K flights
         int level = 0;
@@ -100,7 +99,7 @@ private:
 
     // O(V + E) time complexity for DFS where V is the number of unique airports and E is the number of routes
     // O(V) space complexity for visited set, disc, low, parent maps, and recursion stack in the worst case where the graph is a single path (like a linked list)
-    void dfs(const std::string& node, std::unordered_set<std::string>& visited, std::unordered_set<std::string>& ap) {
+    void Graph::dfs(const std::string& node, std::unordered_set<std::string>& visited, std::unordered_set<std::string>& ap) {
         disc[node] = low[node] = time++;
         visited.insert(node);
         int child_count = 0;
@@ -134,15 +133,9 @@ private:
     }
 
 
-public:
-    Graph(const std::string& routes_csv) {
-        directed_adj = make_adj_list(routes_csv, true);
-        undirected_adj = make_adj_list(routes_csv, false);
-    }
-
     // O((V + E) log V) time complexity for Dijkstra's algorithm where V is the number of unique airports and E is the number of routes
     // O(V + E) | pq: O(E) cuz duplicate entries can exist (we add new entries for the same airport when we find a shorter path)
-    PathResult Dijkstra(const std::string& src, const std::string& dst, const std::string& weight) {
+    PathResult Graph::Dijkstra(const std::string& src, const std::string& dst, const std::string& weight) {
         std::unordered_map<std::string, double> dist; // O(V)
         std::unordered_map<std::string, std::string> prev; // O(V)
         PathResult result;
@@ -249,7 +242,7 @@ public:
 
     // O(V_K + E_K) time complexity for BFS where V_K is the number of unique airports reachable within K flights and E_K is the number of routes among those airports
     // O(V_K) space complexity for reachable airports list 
-    ReachableResult Reachable(const std::string& src, int K) {
+    ReachableResult Graph::Reachable(const std::string& src, int K) {
         ReachableResult result;
         result.reachable_airports = bfs(src, K);
         result.found = !result.reachable_airports.empty();
@@ -258,7 +251,7 @@ public:
 
     // O(V + E) time complexity for DFS where V is the number of unique airports and E is the number of routes
     // O(V) space complexity
-    std::vector<std::string> ArticulationPoints() {
+    std::vector<std::string> Graph::ArticulationPoints() {
         std::unordered_set<std::string> visited;
         std::unordered_set<std::string> ap;
         disc.clear();
@@ -279,7 +272,7 @@ public:
 
     // O((V + E) log V) time complexity for Prim's algorithm where V is the number of unique airports and E is the number of routes
     // O(E + V) 
-    std::vector<CandidateEdge> Prim(const std::string& weight_type) {
+    std::vector<CandidateEdge> Graph::Prim(const std::string& weight_type) {
         struct CompareEdge {
             bool operator()(const CandidateEdge& a, const CandidateEdge& b) const {
                 return a.weight > b.weight;
@@ -335,7 +328,7 @@ public:
 
     // O((V + E) log V) time complexity for Dijkstra's algorithm with budget constraint where V is the number of unique airports and E is the number of routes
     // O(V + E) | pq: O(E) cuz duplicate entries can exist (we add new entries for the same airport when we find a cheaper path)
-    std::vector<std::string> budgetLimited(const std::string& src, const double& budget) {
+    std::vector<std::string> Graph::budgetLimited(const std::string& src, const double& budget) {
         std::unordered_map<std::string, double> dist;
         std::vector<std::string> reachable_airports;
 
@@ -404,4 +397,3 @@ public:
 
         return reachable_airports;
     }
-};

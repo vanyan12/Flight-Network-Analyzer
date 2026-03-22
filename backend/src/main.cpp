@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+#include <cstdlib>
 
 #include "graph.h"
 #include "httplib.h" 
