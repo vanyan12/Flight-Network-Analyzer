@@ -2,6 +2,9 @@
 
 An interactive, graph-based flight network visualization and analysis tool. The application lets you explore a network of **40 airports** and **100 flight routes** through a visual map interface backed by a C++ server that runs classic graph algorithms in real time.
 
+<img width="1696" height="863" alt="Flight Analyzer" src="https://github.com/user-attachments/assets/a5e82485-9af7-4ed9-9587-37d2adc5aae2" />
+
+
 ---
 
 ## 📖 Table of Contents
